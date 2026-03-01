@@ -329,6 +329,17 @@ export default function MenuPage() {
             {filtered.map(item => <MenuCard key={item.id} item={item} qty={getQty(item.id)} onAdd={() => addToCart(item)} onRemove={() => updateQty(item.id, -1)} onShowDetail={() => setDetailModalItem(item)} />)}
           </div>
         )}
+
+        {/* Bottom Ad Banner - Sticky at Bottom */}
+        <div className="bottom-ad-banner sticky-bottom">
+          <a href="https://www.telkomsel.com/" target="_blank" rel="noopener noreferrer" className="bottom-ad-link">
+            <div className="bottom-ad-bg"></div>
+            <div className="bottom-ad-overlay">
+              <span className="bottom-ad-label">IKLAN</span>
+              <span className="bottom-ad-text">Promo Spesial dari Telkomsel!</span>
+            </div>
+          </a>
+        </div>
       </div>
 
       {checkoutOpen && <CheckoutModal onClose={() => setCheckoutOpen(false)} />}
