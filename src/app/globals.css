@@ -759,7 +759,7 @@ body {
   padding: 12px 24px; border-radius: 99px; border: none;
   font-weight: 800; font-size: 14px; cursor: pointer;
   box-shadow: 0 6px 24px var(--accent-glow);
-  z-index: 100; white-space: nowrap;
+  z-index: 200; white-space: nowrap;
   font-family: 'Plus Jakarta Sans', sans-serif;
   animation: fabIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
