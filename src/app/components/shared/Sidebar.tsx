@@ -20,7 +20,15 @@ export default function Sidebar() {
     <nav className="sidebar">
       {/* Logo */}
       <div className="sidebar-logo">
-        <div className="logo-icon">🥗</div>
+        <div className="logo-icon">
+          <Image 
+            src="/logo/hy-logo.jpg"
+            alt="Healthy Yummy Logo"
+            width={50}
+            height={50}
+            className="logo-image"
+          />
+        </div>
         <div className="logo-text">
           <div className="logo-name">Healthy Yummy</div>
         </div>
