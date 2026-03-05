@@ -1,10 +1,17 @@
 'use client';
 import { formatCurrency, orderTypeLabel, generateWhatsAppMessage } from '../../lib/constants';
+import { useApp } from '../../lib/AppContext';
 import type { Order } from '../../types';
 
 interface Props { order: Order; onClose: () => void; }
 
 export default function SuccessModal({ order, onClose }: Props) {
+  const { resetOrderFlow } = useApp();
+
+  const handleClose = () => {
+    resetOrderFlow();
+    onClose();
+  };
   const handleShareWhatsApp = () => {
     const message = generateWhatsAppMessage(order);
     window.open(`https://wa.me/?text=${message}`, '_blank');
@@ -96,7 +103,7 @@ export default function SuccessModal({ order, onClose }: Props) {
           <button
             className="btn btn-primary"
             style={{ width: '100%', justifyContent: 'center', padding: 14 }}
-            onClick={onClose}
+            onClick={handleClose}
           >
             Tutup
           </button>

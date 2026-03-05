@@ -1,139 +1,12 @@
-// 'use client';
-// import { useState, useEffect } from 'react';
-// import { useApp } from '../../lib/AppContext';
-// import { MENU_ITEMS, ADS, formatCurrency } from '../../lib/constants';
-// import type { Category } from '../../types';
-// import CheckoutModal from './CheckoutModal';
-// import RegistrationModal from './RegistrationModal';
-
-// export default function MenuPage() {
-//   const { addToCart, cart } = useApp();
-//   const [category, setCategory] = useState<Category>('all');
-//   const [search, setSearch] = useState('');
-//   const [adIdx, setAdIdx] = useState(0);
-//   const [checkoutOpen, setCheckoutOpen] = useState(false);
-//   const [regOpen, setRegOpen] = useState(false);
-
-//   useEffect(() => {
-//     const t = setInterval(() => setAdIdx(i => (i + 1) % ADS.length), 5000);
-//     return () => clearInterval(t);
-//   }, []);
-
-//   const filtered = MENU_ITEMS.filter(i =>
-//     (category === 'all' || i.category === category) &&
-//     i.name.toLowerCase().includes(search.toLowerCase())
-//   );
-
-//   const ad = ADS[adIdx];
-//   const cartCount = cart.reduce((s, x) => s + x.qty, 0);
-
-//   return (
-//     <>
-//       {/* Topbar */}
-//       <div className="topbar">
-//         <div className="topbar-title">🍽️ Menu Order</div>
-//         <div className="topbar-right">
-//           <div className="search-wrap">
-//             <input
-//               className="search-input"
-//               placeholder="Cari menu…"
-//               value={search}
-//               onChange={e => setSearch(e.target.value)}
-//             />
-//           </div>
-//           <button className="btn btn-ghost btn-sm" onClick={() => setRegOpen(true)}>
-//             👤 Daftar Member
-//           </button>
-//           {/* Mobile cart button */}
-//           <button
-//             className="btn btn-primary btn-sm"
-//             style={{ display: 'none' }}
-//             id="mobile-cart-btn"
-//             onClick={() => setCheckoutOpen(true)}
-//           >
-//             🛒 {cartCount > 0 ? cartCount : ''}
-//           </button>
-//         </div>
-//       </div>
-
-//       <div className="page-content">
-//         {/* Ad Banner */}
-//         <div className="ad-banner" style={{ background: ad.gradient }}>
-//           <div className="ad-content">
-//             <div className="ad-title">{ad.title}</div>
-//             <div className="ad-text">{ad.text}</div>
-//           </div>
-//           <div className="ad-chip">PROMO</div>
-//         </div>
-
-//         {/* Filters */}
-//         <div className="filter-tabs">
-//           {(['all', 'food', 'drink'] as Category[]).map(c => (
-//             <button
-//               key={c}
-//               className={`filter-tab ${category === c ? 'active' : ''}`}
-//               onClick={() => setCategory(c)}
-//             >
-//               {c === 'all' ? '🍽️ Semua' : c === 'food' ? '🥘 Makanan' : '🥤 Minuman'}
-//             </button>
-//           ))}
-//           <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text3)', alignSelf: 'center' }}>
-//             {filtered.length} menu
-//           </span>
-//         </div>
-
-//         {/* Menu Grid */}
-//         <div className="menu-grid">
-//           {filtered.map(item => {
-//             const inCart = cart.find(c => c.id === item.id);
-//             return (
-//               <div
-//                 key={item.id}
-//                 className={`menu-card ${inCart ? 'in-cart' : ''}`}
-//                 onClick={() => addToCart(item)}
-//               >
-//                 {inCart && <div className="menu-qty-badge">{inCart.qty}</div>}
-//                 <span className="menu-emoji">{item.emoji}</span>
-//                 <div className="menu-name" style={{color: 'var(--text)'}}>{item.name}</div>
-//                 <div className="menu-desc">{item.desc}</div>
-//                 <div className="menu-price">{formatCurrency(item.price)}</div>
-//               </div>
-//             );
-//           })}
-//         </div>
-
-//         {filtered.length === 0 && (
-//           <div className="empty-state">
-//             <div className="empty-state-icon">🔍</div>
-//             <div style={{ fontSize: 15, fontWeight: 700 }}>Menu tidak ditemukan</div>
-//             <div style={{ fontSize: 13, marginTop: 4 }}>Coba kata kunci lain</div>
-//           </div>
-//         )}
-//       </div>
-
-//       {checkoutOpen && <CheckoutModal onClose={() => setCheckoutOpen(false)} />}
-//       {regOpen && <RegistrationModal onClose={() => setRegOpen(false)} />}
-//     </>
-//   );
-// }
-
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useApp } from '../../lib/AppContext';
 import { ADS, formatCurrency } from '../../lib/constants';
 import type { Category, MenuItem } from '../../types';
 import CheckoutModal from './CheckoutModal';
-import RegistrationModal from './RegistrationModal';
 import ProductDetailModal from './ProductDetailModal';
-
-const TAG_CONFIG: Record<string, { label: string; style: string }> = {
-  bestseller: { label: '⭐ Terlaris', style: 'tag-bestseller' },
-  new:        { label: '🆕 Baru',     style: 'tag-new'        },
-  spicy:      { label: '🌶️ Pedas',   style: 'tag-spicy'      },
-  vegetarian: { label: '🌿 Veg',      style: 'tag-veg'        },
-  healthy:    { label: '💪 Sehat',    style: 'tag-healthy'    },
-};
 
 function MenuImage({ item }: { item: MenuItem }) {
   const [imgError, setImgError] = useState(false);
@@ -145,85 +18,66 @@ function MenuImage({ item }: { item: MenuItem }) {
     );
   }
   return (
-    <div className="menu-img-wrap">
-      <Image
-        src={item.image}
-        alt={item.name}
-        fill
-        sizes="(max-width: 768px) 50vw, 200px"
-        className="menu-img"
-        onError={() => setImgError(true)}
-      />
-    </div>
+    <Image 
+      src={item.image}
+      alt={item.name}
+      fill
+      sizes="120px"
+      className="menu-img"
+      onError={() => setImgError(true)}
+    />
   );
 }
 
-function MenuCard({ item, qty, onAdd, onRemove, onShowDetail }: {
-  item: MenuItem; qty: number; onAdd: () => void; onRemove: () => void; onShowDetail: () => void;
+function MenuCard({ item, qty, onAdd, onShowDetail }: {
+  item: MenuItem; qty: number; onAdd: () => void; onShowDetail: () => void;
 }) {
-  const primaryTag = item.tags?.[0];
-  const tagCfg = primaryTag ? TAG_CONFIG[primaryTag] : null;
-  const isUnavailable = item.isAvailable === false;
-
+  const isUnavailable = item.isAvailable === false || item.stock === 0;
   return (
-    <div
-      className={`menu-card2${qty > 0 ? ' in-cart2' : ''}${isUnavailable ? ' unavailable' : ''}`}
-      onClick={() => !isUnavailable && onAdd()}
-    >
-      <div className="menu-photo-area">
+    <div className={`menu-card2 ${isUnavailable ? 'unavailable' : ''}`}>
+      <div className="menu-card2-img" onClick={onShowDetail}>
         <MenuImage item={item} />
-        {tagCfg && <div className={`menu-tag-badge ${tagCfg.style}`}>{tagCfg.label}</div>}
-        {qty > 0 && (
-          <div className="menu-qty-overlay">
-            <button className="qty-ctrl-btn" onClick={e => { e.stopPropagation(); onRemove(); }}>−</button>
-            <span className="qty-ctrl-num">{qty}</span>
-            <button className="qty-ctrl-btn" onClick={e => { e.stopPropagation(); onAdd(); }}>+</button>
+        {isUnavailable && (
+          <div className="menu-unavail-overlay">
+            <span>❌ Stok Habis</span>
           </div>
         )}
-        {isUnavailable && <div className="menu-unavail-overlay"><span>Habis</span></div>}
       </div>
-
-      <div className="menu-card2-body">
+      <div className="menu-card2-body" onClick={!isUnavailable ? onAdd : undefined}>
         <div className="menu-card2-name">{item.name}</div>
-        <div className="menu-card2-desc">{item.desc}</div>
-        <div className="menu-card2-footer">
-          <div className="menu-card2-price">{formatCurrency(item.price)}</div>
-          {item.calories !== undefined && item.calories > 0 && (
-            <div className="menu-calories">🔥 {item.calories} kal</div>
-          )}
-        </div>
-        {item.tags && item.tags.length > 1 && (
-          <div className="menu-tags-row">
-            {item.tags.slice(1).map(t => (
-              <span key={t} className={`menu-tag-sm ${TAG_CONFIG[t]?.style ?? ''}`}>
-                {TAG_CONFIG[t]?.label ?? t}
-              </span>
-            ))}
-          </div>
-        )}
-        {qty === 0 && !isUnavailable && (
-          <div className="menu-card2-actions">
-            <button className="menu-add-btn" onClick={e => { e.stopPropagation(); onAdd(); }}>
-              + Tambah
-            </button>
-            <button className="menu-detail-btn" onClick={e => { e.stopPropagation(); onShowDetail(); }}>
-              ℹ️ Detail
-            </button>
-          </div>
-        )}
+        <div className="menu-card2-price">{formatCurrency(item.price)}</div>
       </div>
+      {qty > 0 ? (
+        <div className="menu-qty-control" onClick={(e) => e.stopPropagation()}>
+          <button className="qty-btn" onClick={onShowDetail}>−</button>
+          <span className="qty-num">{qty}</span>
+          <button className="qty-btn" onClick={onAdd}>+</button>
+        </div>
+      ) : !isUnavailable && (
+        <div className="menu-card2-actions" onClick={(e) => e.stopPropagation()}>
+          <button className="menu-add-btn" onClick={onAdd}>+ Tambah</button>
+          <button className="menu-detail-btn" onClick={onShowDetail}>ℹ️ Detail</button>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function MenuPage() {
-  const { addToCart, updateQty, cart, menuItems } = useApp();
+  const router = useRouter();
+  const { addToCart, updateQty, cart, menuItems, orderType, selectedMemberId, customerName, selectedMember } = useApp();
   const [category, setCategory] = useState<Category>('all');
   const [search, setSearch] = useState('');
   const [adIdx, setAdIdx] = useState(0);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [regOpen, setRegOpen] = useState(false);
   const [detailModalItem, setDetailModalItem] = useState<MenuItem | null>(null);
+
+  // Redirect if order type not selected
+  useEffect(() => {
+    if (!orderType) {
+      router.push('/pos/order-type');
+    }
+  }, [orderType, router]);
 
   useEffect(() => {
     const t = setInterval(() => setAdIdx(i => (i + 1) % ADS.length), 5000);
@@ -242,15 +96,33 @@ export default function MenuPage() {
   const drinkItems = filtered.filter(i => i.category === 'drink');
   const ad = ADS[adIdx];
 
+  // Get order type display
+  const orderTypeDisplay = orderType === 'pickup' ? '📦 Pickup' : orderType === 'dine-in' ? '🍽️ Dine In' : orderType === 'takeaway' ? '🛵 Takeaway' : '';
+  const memberDisplay = selectedMemberId ? `👤 ${selectedMember?.name || customerName}` : '😐 Tamu';
+
   return (
     <>
+      {/* Order Info Bar */}
+      <div className="order-info-bar">
+        <div className="order-info-item" onClick={() => router.push('/pos/order-type')}>
+          <span className="order-info-icon">{orderType === 'pickup' ? '' : orderType === 'dine-in' ? '' : orderType === 'takeaway' ? '' : ''}</span>
+          <span className="order-info-text">{orderTypeDisplay}</span>
+          <span className="order-info-edit">✏️</span>
+        </div>
+        <div className="order-info-divider" />
+        <div className="order-info-item" onClick={() => router.push('/pos/member')}>
+          <span className="order-info-icon">{selectedMemberId ? '' : ''}</span>
+          <span className="order-info-text">{memberDisplay}</span>
+          <span className="order-info-edit">✏️</span>
+        </div>
+      </div>
+
       <div className="topbar">
         <div className="topbar-title">🍽️ Menu Hari Ini</div>
         <div className="topbar-right">
           <div className="search-wrap">
             <input className="search-input" placeholder="Cari menu…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={() => setRegOpen(true)}>👤 Daftar Member</button>
           {cartCount > 0 && (
             <button className="mobile-cart-fab" onClick={() => setCheckoutOpen(true)}>
               🛒 {cartCount} · {formatCurrency(cartTotal)}
@@ -261,90 +133,83 @@ export default function MenuPage() {
 
       <div className="page-content">
         {/* Ad Banner */}
-        <div style={{ marginBottom: 20 }}>
-          <div className="ad-banner" style={{ background: ad.gradient, cursor: 'pointer' }}
-            onClick={() => setAdIdx(i => (i + 1) % ADS.length)}>
-            <div className="ad-content">
-              <div className="ad-title">{ad.title}</div>
-              <div className="ad-text">{ad.text}</div>
-            </div>
-            <div className="ad-chip">PROMO</div>
+        <div className="ad-banner" style={{ background: ad.gradient }}>
+          <div className="ad-content">
+            <div className="ad-title">{ad.title}</div>
+            <div className="ad-text">{ad.text}</div>
           </div>
-          <div className="ad-dots">
-            {ADS.map((_, i) => (
-              <button key={i} className={`ad-dot${i === adIdx ? ' active' : ''}`} onClick={() => setAdIdx(i)} />
-            ))}
-          </div>
+          <div className="ad-chip">PROMO</div>
         </div>
 
         {/* Filters */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
-          <div className="filter-tabs" style={{ marginBottom: 0 }}>
-            {(['all', 'food', 'drink'] as Category[]).map(c => (
-              <button key={c} className={`filter-tab${category === c ? ' active' : ''}`} onClick={() => setCategory(c)}>
-                {c === 'all' ? '🍽️ Semua' : c === 'food' ? '🥘 Makanan' : '🥤 Minuman'}
-              </button>
-            ))}
-          </div>
-          <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text3)', whiteSpace: 'nowrap' }}>
-            {filtered.length} menu
-          </span>
-        </div>
-
-        {/* Tag legend */}
-        <div className="tag-legend">
-          {Object.entries(TAG_CONFIG).map(([k, v]) => (
-            <span key={k} className={`menu-tag-sm ${v.style}`}>{v.label}</span>
+        <div className="filter-tabs">
+          {(['all', 'food', 'drink'] as Category[]).map(c => (
+            <button
+              key={c}
+              className={`filter-tab ${category === c ? 'active' : ''}`}
+              onClick={() => setCategory(c)}
+            >
+              {c === 'all' ? '🍽️ Semua' : c === 'food' ? '🥘 Makanan' : '🥤 Minuman'}
+            </button>
           ))}
         </div>
 
-        {/* Grid */}
-        {filtered.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">🔍</div>
-            <div style={{ fontSize: 15, fontWeight: 700 }}>Menu tidak ditemukan</div>
-            <div style={{ fontSize: 13, marginTop: 4, color: 'var(--text2)' }}>Coba kata kunci lain</div>
-          </div>
-        ) : category === 'all' ? (
-          <>
-            {foodItems.length > 0 && (
-              <section style={{ marginBottom: 28 }}>
-                <div className="menu-section-title">🥘 Makanan</div>
-                <div className="menu-grid2">
-                  {foodItems.map(item => <MenuCard key={item.id} item={item} qty={getQty(item.id)} onAdd={() => addToCart(item)} onRemove={() => updateQty(item.id, -1)} onShowDetail={() => setDetailModalItem(item)} />)}
-                </div>
-              </section>
-            )}
-            {drinkItems.length > 0 && (
-              <section>
-                <div className="menu-section-title">🥤 Minuman</div>
-                <div className="menu-grid2">
-                  {drinkItems.map(item => <MenuCard key={item.id} item={item} qty={getQty(item.id)} onAdd={() => addToCart(item)} onRemove={() => updateQty(item.id, -1)} onShowDetail={() => setDetailModalItem(item)} />)}
-                </div>
-              </section>
-            )}
-          </>
-        ) : (
-          <div className="menu-grid2">
-            {filtered.map(item => <MenuCard key={item.id} item={item} qty={getQty(item.id)} onAdd={() => addToCart(item)} onRemove={() => updateQty(item.id, -1)} onShowDetail={() => setDetailModalItem(item)} />)}
+        {/* Food Section */}
+        {foodItems.length > 0 && (
+          <div className="menu-section">
+            <div className="menu-section-title">🥘 Makanan</div>
+            <div className="menu-grid2">
+              {foodItems.map(item => (
+                <MenuCard
+                  key={item.id}
+                  item={item}
+                  qty={getQty(item.id)}
+                  onAdd={() => addToCart(item)}
+                  onShowDetail={() => setDetailModalItem(item)}
+                />
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Bottom Ad Banner - Sticky at Bottom */}
-        <div className="bottom-ad-banner sticky-bottom">
-          <a href="https://www.telkomsel.com/" target="_blank" rel="noopener noreferrer" className="bottom-ad-link">
-            <div className="bottom-ad-bg"></div>
-            <div className="bottom-ad-overlay">
-              <span className="bottom-ad-label">IKLAN</span>
-              <span className="bottom-ad-text">Promo Spesial dari Telkomsel!</span>
+        {/* Drink Section */}
+        {drinkItems.length > 0 && (
+          <div className="menu-section">
+            <div className="menu-section-title">🥤 Minuman</div>
+            <div className="menu-grid2">
+              {drinkItems.map(item => (
+                <MenuCard
+                  key={item.id}
+                  item={item}
+                  qty={getQty(item.id)}
+                  onAdd={() => addToCart(item)}
+                  onShowDetail={() => setDetailModalItem(item)}
+                />
+              ))}
             </div>
-          </a>
-        </div>
+          </div>
+        )}
+
+        {filtered.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-state-icon">🔍</div>
+            <div style={{ fontSize: 15, fontWeight: 700 }}>Menu tidak ditemukan</div>
+            <div style={{ fontSize: 13, marginTop: 4 }}>Coba kata kunci lain</div>
+          </div>
+        )}
       </div>
 
       {checkoutOpen && <CheckoutModal onClose={() => setCheckoutOpen(false)} />}
-      {regOpen && <RegistrationModal onClose={() => setRegOpen(false)} />}
-      {detailModalItem && <ProductDetailModal item={detailModalItem} onClose={() => setDetailModalItem(null)} onAddToCart={() => { addToCart(detailModalItem); setDetailModalItem(null); }} />}
+      {detailModalItem && (
+        <ProductDetailModal 
+          item={detailModalItem} 
+          onClose={() => setDetailModalItem(null)} 
+          onAddToCart={() => {
+            addToCart(detailModalItem);
+            setDetailModalItem(null);
+          }} 
+        />
+      )}
     </>
   );
 }

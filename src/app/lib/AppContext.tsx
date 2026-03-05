@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import type { CartItem, Member, Order, MenuItem, OrderStatus } from '../types';
+import type { CartItem, Member, Order, MenuItem, OrderStatus, OrderType } from '../types';
 import { DEFAULT_MEMBERS, generateBookingCode, MENU_ITEMS } from './constants';
 
 type PlaceOrderInput = Omit<Order, 'id' | 'code' | 'items' | 'total' | 'status' | 'createdAt'>;
@@ -11,6 +11,12 @@ interface AppCtx {
   orders: Order[];
   menuItems: MenuItem[];
   tableCount: number;
+  orderType: OrderType | null;
+  selectedMemberId: number | null;
+  guestName: string;
+  guestPhone: string;
+  selectedMember: Member | undefined;
+  customerName: string;
   addToCart: (item: MenuItem) => void;
   updateQty: (id: number, delta: number) => void;
   clearCart: () => void;
@@ -25,6 +31,10 @@ interface AppCtx {
   updateMenuItem: (id: number, item: Partial<MenuItem>) => void;
   deleteMenuItem: (id: number) => void;
   setTableCount: (n: number) => void;
+  setOrderType: (type: OrderType | null) => void;
+  setSelectedMemberId: (id: number | null) => void;
+  setGuestInfo: (name: string, phone: string) => void;
+  resetOrderFlow: () => void;
 }
 
 const Ctx = createContext<AppCtx>({} as AppCtx);
@@ -46,12 +56,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [menuItems, setMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
   const [tableCount, setTableCountState] = useState<number>(10);
   const [ready, setReady] = useState(false);
+  
+  // New: Order flow state
+  const [orderType, setOrderTypeState] = useState<OrderType | null>(null);
+  const [selectedMemberId, setSelectedMemberIdState] = useState<number | null>(null);
+  const [guestName, setGuestName] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
 
   useEffect(() => {
     setMembers(load('hy_members', DEFAULT_MEMBERS));
     setOrders(load('hy_orders', []));
     setMenuItems(load('hy_menu_items', MENU_ITEMS));
     setTableCountState(load('hy_tables', 10));
+    setOrderTypeState(load('hy_order_type', null));
+    setSelectedMemberIdState(load('hy_selected_member_id', null));
+    setGuestName(load('hy_guest_name', ''));
+    setGuestPhone(load('hy_guest_phone', ''));
+    setCart(load('hy_cart', []));
     setReady(true);
   }, []);
 
@@ -109,6 +130,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
     save('hy_tables', n);
   }, []);
 
+  const setOrderType = useCallback((type: OrderType | null) => {
+    setOrderTypeState(type);
+    save('hy_order_type', type);
+  }, []);
+
+  const setSelectedMemberId = useCallback((id: number | null) => {
+    setSelectedMemberIdState(id);
+    save('hy_selected_member_id', id);
+  }, []);
+
+  const setGuestInfo = useCallback((name: string, phone: string) => {
+    setGuestName(name);
+    setGuestPhone(phone);
+    save('hy_guest_name', name);
+    save('hy_guest_phone', phone);
+  }, []);
+
+  const resetOrderFlow = useCallback(() => {
+    setOrderTypeState(null);
+    setSelectedMemberIdState(null);
+    setGuestName('');
+    setGuestPhone('');
+    setCart([]);
+    save('hy_order_type', null);
+    save('hy_selected_member_id', null);
+    save('hy_guest_name', '');
+    save('hy_guest_phone', '');
+    save('hy_cart', []);
+  }, []);
+
   const addMenuItem = useCallback((item: Omit<MenuItem, 'id'>) => {
     setMenuItems(prev => {
       const newItem = { ...item, id: Date.now() };
@@ -152,12 +203,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   if (!ready) return null;
 
+  // Helper to get selected member
+  const selectedMember = members.find(m => m.id === selectedMemberId);
+  const customerName = selectedMember ? selectedMember.name : guestName;
+
   return (
     <Ctx.Provider value={{
       cart, members, orders, menuItems, tableCount,
+      orderType, selectedMemberId, guestName, guestPhone, selectedMember, customerName,
       addToCart, updateQty, clearCart, cartTotal, cartCount,
       addMember, placeOrder, markOrderPaid, updateOrderStatus, updateOrderEvidence,
       addMenuItem, updateMenuItem, deleteMenuItem, setTableCount,
+      setOrderType, setSelectedMemberId, setGuestInfo, resetOrderFlow,
     }}>
       {children}
     </Ctx.Provider>

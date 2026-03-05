@@ -155,9 +155,11 @@ export const MENU_ITEMS: MenuItem[] = [
 ];
 
 export const ADS: Ad[] = [
-  { id: 1, title: '🎉 Promo Spesial!',     text: 'Beli 2 menu utama, gratis 1 minuman segar',    gradient: 'linear-gradient(135deg,#e91e8c,#ff6b9d)' },
-  { id: 2, title: '✨ Daftar Member',       text: 'Daftar sekarang & dapatkan diskon 10% setiap order', gradient: 'linear-gradient(135deg,#7c3aed,#a855f7)' },
-  { id: 3, title: '👨‍👩‍👧 Paket Keluarga',  text: 'Hemat hingga 20% untuk paket makan 4 orang',  gradient: 'linear-gradient(135deg,#0ea47a,#34d399)' },
+  { id: 1, title: '📱 Samsung', text: 'Galaxy S24 Ultra - AI Phone Terdepan', gradient: 'linear-gradient(135deg,#1428A0,#1E40AF)' },
+  { id: 2, title: '🧔 Kahf', text: 'Skincare Pria - Siap Meraih Mimpi', gradient: 'linear-gradient(135deg,#F4B400,#FBBF24)' },
+  { id: 3, title: '📶 Telkomsel', text: 'Semua Bisa Digital', gradient: 'linear-gradient(135deg,#E60000,#DC2626)' },
+  { id: 4, title: '🏍️ Honda', text: 'BeAT - Irit Dimanapun', gradient: 'linear-gradient(135deg,#CC0000,#EF4444)' },
+  { id: 5, title: '🍎 Apple', text: 'iPhone 15 Pro - Titanium. So Strong.', gradient: 'linear-gradient(135deg,#1C1C1E,#374151)' },
 ];
 
 export const DEFAULT_MEMBERS: Member[] = [

@@ -295,6 +295,48 @@ body {
   font-size: 19px; font-weight: 800; color: var(--text);
   white-space: nowrap;
 }
+
+/* Order Info Bar */
+.order-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.order-info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.order-info-item:hover {
+  border-color: var(--accent);
+}
+.order-info-icon {
+  font-size: 14px;
+}
+.order-info-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.order-info-edit {
+  font-size: 11px;
+  color: var(--text3);
+  margin-left: 4px;
+}
+.order-info-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+}
 .topbar-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
 .page-content { flex: 1; overflow-y: auto; padding: 20px; }
 
@@ -372,6 +414,9 @@ body {
 .btn-green:hover { opacity: 0.88; }
 .btn-green:disabled { opacity: 0.35; cursor: not-allowed; }
 .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+.btn-outline { background: transparent; color: var(--accent); border: 2px solid var(--accent); }
+.btn-outline:hover { background: var(--accent-bg); }
+.btn-lg { padding: 14px 24px; font-size: 15px; }
 .btn-sm { padding: 6px 13px; font-size: 12.5px; border-radius: 8px; }
 .btn-icon {
   padding: 0; width: 36px; height: 36px;
@@ -602,6 +647,24 @@ body {
   flex-shrink: 0;
 }
 
+/* Card image container */
+.menu-card2-img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.menu-card2-img .menu-img {
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.menu-card2:hover .menu-card2-img .menu-img {
+  transform: scale(1.06);
+}
+
 /* ── Real photo ── */
 .menu-img-wrap {
   position: absolute; inset: 0;
@@ -710,10 +773,10 @@ body {
 
 /* ── Add button ── */
 .menu-add-btn {
-  margin-top: 8px; width: 100%; padding: 8px;
+  margin-top: 8px; width: 100%; padding: 4px;
   border-radius: 99px; border: 1.5px solid var(--accent);
   background: none; cursor: pointer;
-  color: var(--accent); font-size: 13px; font-weight: 700;
+  color: var(--accent); font-size: 14px; font-weight: 700;
   font-family: 'Avenir', 'Avenir Next', sans-serif;
   transition: all 0.18s;
 }
@@ -1016,6 +1079,9 @@ body {
   display: flex;
   gap: 8px;
   margin-top: 10px;
+  margin-left: 4px;
+  margin-right: 4px;
+  margin-bottom: 4px;
 }
 
 .menu-detail-btn {

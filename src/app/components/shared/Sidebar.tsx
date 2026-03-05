@@ -2,15 +2,22 @@
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useTheme } from '../../lib/ThemeContext';
+import { useApp } from '../../lib/AppContext';
 
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
+  const { resetOrderFlow } = useApp();
+
+  const handleNewOrder = () => {
+    resetOrderFlow();
+    router.push('/pos/order-type');
+  };
 
   const POS_NAV = [
-    { key: '/pos',         icon: '🍽️', label: 'Order Menu' },
-    { key: '/pos/status',  icon: '📦', label: 'Cek Status' },
+    { key: '/pos/order-type', icon: '🆕', label: 'New Order' },
+    { key: '/pos/status',     icon: '📦', label: 'Cek Status' },
   ];
 
   const orderUrl = 'https://hy.menu.alf-corp.id/pos';
@@ -40,7 +47,7 @@ export default function Sidebar() {
         <button
           key={item.key}
           className={`nav-btn ${pathname === item.key ? 'active' : ''}`}
-          onClick={() => router.push(item.key)}
+          onClick={item.key === '/pos/order-type' ? handleNewOrder : () => router.push(item.key)}
         >
           <span className="nicon">{item.icon}</span>
           <span>{item.label}</span>
